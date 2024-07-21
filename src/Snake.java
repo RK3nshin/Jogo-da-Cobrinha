@@ -1,25 +1,17 @@
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 public class Snake {
     private int Velocidade = 10;
-    private int TamanhoInicial = 3;
     public   Celula  Cabeca ;
-    public   LinkedList<Celula> Corpo =  new LinkedList<>();
+    public   ArrayList<Celula> Corpo =  new ArrayList<Celula>();
 
 
 
     public Snake(Celula PosicaoInicial, int TamanhoBloco) {
-        for ( int i = 0; i < TamanhoInicial; i++){
-          if(Corpo.isEmpty()){
             Cabeca = PosicaoInicial;
-            Corpo.add(Cabeca);
-          }else {
-            Celula Temp = new Celula (Corpo.getLast().getPx()+ TamanhoBloco , Corpo.getLast().getPy());
+            Celula Temp = new Celula (Cabeca.getPx()+ TamanhoBloco , Cabeca.getPy());
             Corpo.add(Temp);
-          }
-        }
-       
     }
 
     public int getVelocidade() {

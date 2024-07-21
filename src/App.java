@@ -17,7 +17,7 @@ public class App {
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Necessário para que o painel receba foco e eventos de teclado
+        // foco e eventos de teclado
         jogo.requestFocus();
     }
 }

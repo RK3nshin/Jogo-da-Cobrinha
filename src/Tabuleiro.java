@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -23,7 +24,6 @@ public class Tabuleiro extends JPanel implements ActionListener, KeyListener{
     private Image ImagMaca;
     private int VelocidadeX = 1 , VelocidadeY = 0;
     Boolean inicio = true;
-    
 
     public Tabuleiro(int Altura, int Largura) {
         this.T_Largura = Largura;
@@ -34,29 +34,21 @@ public class Tabuleiro extends JPanel implements ActionListener, KeyListener{
         initGame();
 
     }
-
     private  void IniciarTabuleiro(){
-        setBackground(Color.black);
+        setBackground(Color.GRAY);
         setFocusable(true);
         setPreferredSize(new Dimension(this.T_Largura, this.T_Altura));
         addKeyListener(this);
         setFocusable(true);
     }
-
     private   void initGame(){
         System.out.println("Iniciando.....");
         timer = new Timer(Delay, this);
         timer.start();
     }
-
-  
-
     protected void paintComponent (Graphics g){
         super.paintComponent(g);
         draw(g);
-
-    
-
     }
 
     private  void PosicionaComida(){
@@ -67,9 +59,7 @@ public class Tabuleiro extends JPanel implements ActionListener, KeyListener{
         ImagMaca = iia.getImage();
     }
     private void draw(Graphics g){
-
         // Grid
-
         for(int i = 0 ; i < T_Altura /TamanhoBloco; i++){
             g.drawLine(i * TamanhoBloco, 0, i*TamanhoBloco, T_Altura);
             g.drawLine(0, i * TamanhoBloco, T_Largura, i* TamanhoBloco);
@@ -87,36 +77,66 @@ public class Tabuleiro extends JPanel implements ActionListener, KeyListener{
 
         g.setColor(Color.GREEN);
        
-        for (int i = 1; i < this.Cobra.Corpo.size(); i++) {
+        for (int i = 0; i < this.Cobra.Corpo.size(); i++) {
          g.fillRect(this.Cobra.Corpo.get(i).getPx(), 
             this.Cobra.Corpo.get(i).getPy(),
             TamanhoBloco, TamanhoBloco);
     
+        }
+        //Score
+        g.setFont(new Font("Arial",Font.PLAIN,12));
+        if(!inicio){
+            g.setColor(Color.RED);
+            g.drawString("Game Over" + String.valueOf(Cobra.Corpo.size()-1), TamanhoBloco-16, TamanhoBloco );
+        }else{
+            g.drawString("Score " + String.valueOf(Cobra.Corpo.size()-1), TamanhoBloco-16, TamanhoBloco );
         }
     }
 
     public void actionPerformed(ActionEvent e) {
         if (inicio) {
             Mover();
-            Colissao();
             repaint();
+        }else{
+            timer.stop();
         }
     }
 
     public void Mover(){
-        
-        for(Celula C: Cobra.Corpo){
-            C.setPx(C.getPx()+ TamanhoBloco * VelocidadeX);
-            C.setPy(C.getPy()+ TamanhoBloco * VelocidadeY);
-        }
-       
-    }
-    public void Colissao (){
-        if(this.Cobra.Cabeca.equals(this.Comida)){
+        if(Colissao()){
             this.Cobra.Corpo.add(new Celula(Comida.getPx(), Comida.getPy()));
-            System.out.println(this.Cobra.Corpo.size());
             PosicionaComida();
         }
+      for (int i = Cobra.Corpo.size()-1; i >= 0 ; i--) {
+            Celula ParteAtual = Cobra.Corpo.get(i);
+            if(i==0){
+                ParteAtual.setPx(Cobra.Cabeca.getPx());
+                ParteAtual.setPy(Cobra.Cabeca.getPy());
+            }else{
+            Celula ParteFutura = Cobra.Corpo.get(i-1);
+            System.out.println(ParteFutura.equals(Cobra.Corpo.get(i-1)));
+            ParteAtual.setPx(ParteFutura.getPx());
+            ParteAtual.setPy(ParteFutura.getPy()); 
+            }
+        }
+        Cobra.Cabeca.setPx(Cobra.Cabeca.getPx()+ (TamanhoBloco * VelocidadeX));
+        Cobra.Cabeca.setPy(Cobra.Cabeca.getPy()+ (TamanhoBloco * VelocidadeY));
+
+        // Lógica do gameOver
+        for (Celula Parte : Cobra.Corpo) {
+            if(Cobra.Cabeca.equals(Parte)){
+                inicio = false;
+            }
+        }
+        if((Cobra.Cabeca.getPx() > T_Largura || Cobra.Cabeca.getPy() > T_Altura)||
+        (Cobra.Cabeca.getPx() < 0 || Cobra.Cabeca.getPy() < 0)){
+            inicio = false;
+        }
+
+        
+    }
+    public Boolean Colissao (){
+        return this.Cobra.Cabeca.equals(this.Comida);
     }
 
     @Override
@@ -139,16 +159,15 @@ public class Tabuleiro extends JPanel implements ActionListener, KeyListener{
             VelocidadeX = 1;
             VelocidadeY =0;
         }
-        if((e.getKeyCode()== KeyEvent.VK_UP &&  VelocidadeY != -1)){
+        if((e.getKeyCode()== KeyEvent.VK_UP &&  VelocidadeY != 1)){
             VelocidadeX = 0;
             VelocidadeY =-1;
         }
-        if((e.getKeyCode() == KeyEvent.VK_DOWN &&  VelocidadeY !=1)){
+        if((e.getKeyCode() == KeyEvent.VK_DOWN &&  VelocidadeY !=-1)){
             VelocidadeX = 0;
             VelocidadeY =1;
         }
     }
-
 }
 
     
